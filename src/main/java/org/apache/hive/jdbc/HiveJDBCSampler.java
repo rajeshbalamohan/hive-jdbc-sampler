@@ -28,7 +28,6 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     defaultParameters.addArgument("password", "");
     defaultParameters.addArgument("additionalConnectionParams", "?hive.execution.engine=tez");
     defaultParameters.addArgument("Select_OR_Update", "select");
-    defaultParameters.addArgument("initialization_query", "drop table result");
     return defaultParameters;
   }
 
