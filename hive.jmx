@@ -31,7 +31,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="url" elementType="Argument">
                 <stringProp name="Argument.name">url</stringProp>
-                <stringProp name="Argument.value">jdbc:hive2://cn041:10000/default</stringProp>
+                <stringProp name="Argument.value">jdbc:hive2://mymachine:10000/default</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="driver" elementType="Argument">
