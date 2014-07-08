@@ -54,24 +54,19 @@
                 <stringProp name="Argument.value">?hive.execution.engine=tez</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="query" elementType="Argument">
-                <stringProp name="Argument.name">query</stringProp>
-                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
               <elementProp name="Select_OR_Update" elementType="Argument">
                 <stringProp name="Argument.name">Select_OR_Update</stringProp>
                 <stringProp name="Argument.value">select</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="initialization_query" elementType="Argument">
-                <stringProp name="Argument.name">initialization_query</stringProp>
-                <stringProp name="Argument.value">drop table result</stringProp>
+              <elementProp name="query" elementType="Argument">
+                <stringProp name="Argument.name">query</stringProp>
+                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">HiveJDBCSampler</stringProp>
+          <stringProp name="classname">org.apache.hive.jdbc.HiveJDBCSampler</stringProp>
         </JavaSampler>
         <hashTree/>
       </hashTree>
@@ -118,24 +113,19 @@
                 <stringProp name="Argument.value">?hive.execution.engine=tez</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="query" elementType="Argument">
-                <stringProp name="Argument.name">query</stringProp>
-                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
               <elementProp name="Select_OR_Update" elementType="Argument">
                 <stringProp name="Argument.name">Select_OR_Update</stringProp>
                 <stringProp name="Argument.value">select</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="initialization_query" elementType="Argument">
-                <stringProp name="Argument.name">initialization_query</stringProp>
-                <stringProp name="Argument.value">drop table result</stringProp>
+              <elementProp name="query" elementType="Argument">
+                <stringProp name="Argument.name">query</stringProp>
+                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">HiveJDBCSampler</stringProp>
+          <stringProp name="classname">org.apache.hive.jdbc.HiveJDBCSampler</stringProp>
         </JavaSampler>
         <hashTree/>
       </hashTree>
@@ -182,24 +172,19 @@
                 <stringProp name="Argument.value">?hive.execution.engine=tez</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="query" elementType="Argument">
-                <stringProp name="Argument.name">query</stringProp>
-                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
               <elementProp name="Select_OR_Update" elementType="Argument">
                 <stringProp name="Argument.name">Select_OR_Update</stringProp>
                 <stringProp name="Argument.value">select</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="initialization_query" elementType="Argument">
-                <stringProp name="Argument.name">initialization_query</stringProp>
-                <stringProp name="Argument.value">drop table result</stringProp>
+              <elementProp name="query" elementType="Argument">
+                <stringProp name="Argument.name">query</stringProp>
+                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">HiveJDBCSampler</stringProp>
+          <stringProp name="classname">org.apache.hive.jdbc.HiveJDBCSampler</stringProp>
         </JavaSampler>
         <hashTree/>
       </hashTree>
@@ -246,24 +231,19 @@
                 <stringProp name="Argument.value">?hive.execution.engine=tez</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="query" elementType="Argument">
-                <stringProp name="Argument.name">query</stringProp>
-                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
               <elementProp name="Select_OR_Update" elementType="Argument">
                 <stringProp name="Argument.name">Select_OR_Update</stringProp>
                 <stringProp name="Argument.value">select</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="initialization_query" elementType="Argument">
-                <stringProp name="Argument.name">initialization_query</stringProp>
-                <stringProp name="Argument.value">drop table result</stringProp>
+              <elementProp name="query" elementType="Argument">
+                <stringProp name="Argument.name">query</stringProp>
+                <stringProp name="Argument.value">select count(*) from tpcds4_bin_partitioned_orc_200.store_sales where ss_sold_date is null</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">HiveJDBCSampler</stringProp>
+          <stringProp name="classname">org.apache.hive.jdbc.HiveJDBCSampler</stringProp>
         </JavaSampler>
         <hashTree/>
       </hashTree>

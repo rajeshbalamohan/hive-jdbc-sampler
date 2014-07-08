@@ -17,6 +17,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   String username;
   String password;
   boolean select; //select statement or update statement
+  String query;
   JavaSamplerContext context;
 
   @Override
@@ -28,6 +29,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     defaultParameters.addArgument("password", "");
     defaultParameters.addArgument("additionalConnectionParams", "?hive.execution.engine=tez");
     defaultParameters.addArgument("Select_OR_Update", "select");
+    defaultParameters.addArgument("query", "select count(*) from store_sales where ss_sold_date is null");
     return defaultParameters;
   }
 
@@ -67,6 +69,10 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
       this.username = context.getParameter("password");
       this.select = context.getParameter("Select_OR_Update", "select").trim().equalsIgnoreCase
           ("select");
+      this.query = context.getParameter("query");
+      if (this.query == null || this.query.trim().length() == 0) {
+        throw new IllegalArgumentException("Please pass a valid query");
+      }
       initConnection();
     } catch(Exception e) {
       getLogger().error(e.getMessage());
@@ -110,7 +116,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
       result.sampleStart();
       stmt = conn.createStatement();
       if (select) {
-        ResultSet rs = stmt.executeQuery(context.getParameter("query"));
+        ResultSet rs = stmt.executeQuery(query);
         Data data = getDataFromResultSet(rs);
         result.setResponseMessage("\nSuccess : " + data.toString());
       } else {
