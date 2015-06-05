@@ -3,6 +3,8 @@ package org.apache.hive.jdbc;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -21,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -261,8 +264,11 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     }
 
     for (int i = 0; i < col.length; i++) {
-      List<Object> d1Val = d1.getColumnAsObjectArray(col[i]);
-      List<Object> d2Val = d2.getColumnAsObjectArray(col[i]);
+      List d1Val = d1.getColumnAsObjectArray(col[i]);
+      List d2Val = d2.getColumnAsObjectArray(col[i]);
+      //can be expensive (but sometimes data can come in out of order. e.g unordered; query_80)
+      Collections.sort(d1Val, Ordering.natural().nullsFirst());
+      Collections.sort(d2Val, Ordering.natural().nullsFirst());
 
       if (d1Val == null && d2Val == null) {
         continue;
