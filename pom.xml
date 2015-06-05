@@ -9,7 +9,10 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <hadoop.version>2.3.0</hadoop.version>
+        <hadoop.version>2.7.0</hadoop.version>
+        <hive.version>1.2.0</hive.version>
+        <jmeter.version>2.11</jmeter.version>
+        <httpcore.version>4.3.5</httpcore.version>
     </properties>
     <dependencies>
         <dependency>
@@ -22,18 +25,19 @@
         <dependency>
             <groupId>org.apache.jmeter</groupId>
             <artifactId>ApacheJMeter_java</artifactId>
-            <version>2.11</version>
+            <version>${jmeter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
-            <version>0.13.1</version>
+            <version>${hive.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>2.4.0</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcore.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>

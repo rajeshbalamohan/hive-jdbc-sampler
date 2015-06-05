@@ -48,6 +48,14 @@ Running jmeter in non-gui mode:
 
 4. Pass any hiveconf related items in "additionalConnectionParams" parameter of hive.jmx (e.g ?hive.execution.engine=tez;hive.auto.convert.join.noconditionaltask=false)
 
+5. Example command (where we are trying to run a functional check for PipelinedSorter vs DefaultSorter):
+./bin/jmeter -Durl=jdbc:hive2://cn041-10:10002/tpcds5_bin_partitioned_orc_200 -Duser=root -Dpassword= -DadditionalParam="?hive.execution.engine=tez;tez.queue.name=hive1;tez.runtime.sorter.class=LEGACY;tez.runtime.pipelined-shuffle.enabled=false;" -DmpareWithParams="?hive.execution.engine=tez;tez.queue.name=hive1;tez.runtime.pipelined-shuffle.enabled=false;"
+
+Another example could be to compare vectorization result with non-vectorization result.
+
+6. In case you don't want any comparison, just remove "-DcompareWithParams" from previous example. 
+
+//TODO: Remove the unwanted arguments in hive.jmx. Except query, rest of the parameters would be populated via system properties.
 
 Important Note:
 ==============
