@@ -8,7 +8,6 @@ import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.StatisticalSampleResult;
 import org.apache.jorphan.collections.Data;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
@@ -59,10 +58,10 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   private static final String DRIVER = "driver";
   private static final String USERNAME = "username";
   private static final String PASSWORD = "password";
-  private static final String ADDITIONAL_CONN_PARAMS = "additionalConnectionParams";
-  private static final String SELECT_OR_UPDATE = "Select_OR_Update";
+  private static final String ADDITIONAL_CONN_PARAMS = "additionalParams";
+  private static final String SELECT_OR_UPDATE = "queryType";
   private static final String QUERY = "query";
-  private static final String COMPARE_WITH_CONN_PARAMS = "compareWith_ConnectionParams";
+  private static final String COMPARE_WITH_CONN_PARAMS = "compareWithParams";
 
   private static boolean driverLoaded = false;
   private Connection conn = null;
@@ -80,18 +79,6 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   @Override
   public Arguments getDefaultParameters() {
     Arguments defaultParameters = new Arguments();
-    /*
-    defaultParameters.addArgument(URL, "jdbc:hive2://cn041:10000/default");
-    defaultParameters.addArgument(DRIVER, "org.apache.hive.jdbc.HiveDriver");
-    defaultParameters.addArgument(USERNAME, "root");
-    defaultParameters.addArgument(PASSWORD, "");
-    defaultParameters.addArgument(ADDITIONAL_CONN_PARAMS, "?hive.execution.engine=tez");
-    defaultParameters.addArgument(SELECT_OR_UPDATE, "select");
-    defaultParameters.addArgument(QUERY,
-        "select count(*) from store_sales where ss_sold_date is null");
-    defaultParameters.addArgument(COMPARE_WITH_CONN_PARAMS, "");
-    */
-
     //Populate from system.properties instead
     defaultParameters.addArgument(URL, "${__property(url)}");
     defaultParameters.addArgument(DRIVER, "org.apache.hive.jdbc.HiveDriver");
@@ -145,7 +132,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
         System.out.println("Loaded driver : " + context.getParameter("driver"));
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
-        LOG.error("ClassNotFound ",  e);
+        LOG.error("ClassNotFound ", e);
         System.exit(1);
       }
       driverLoaded = true;
@@ -194,11 +181,11 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
       result.sample.setResponseMessage("\nFailed " + Throwables.getStackTraceAsString(e));
       result.sample.setSuccessful(false);
     } finally {
+      result.sample.sampleEnd();
       stmt.close();
       if (!sessionMode) {
         closeConnection(conn);
       }
-      result.sample.sampleEnd();
       LOG.info("Finished executing a query");
     }
     return result;
@@ -206,10 +193,11 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
 
   @Override
   public SampleResult runTest(JavaSamplerContext context) {
-    StatisticalSampleResult statsSample = null;
+    SampleResult sampleResult = new SampleResult();
+    sampleResult.sampleStart();
     try {
       Result r = execute(this.url, this.username, this.password);
-      statsSample = new StatisticalSampleResult(r.sample);
+      sampleResult.addRawSubResult(r.sample);
 
       //Check if we need to compare with another run
       if (compareWithOptions != null && !compareWithOptions.trim().isEmpty()) {
@@ -219,23 +207,33 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
         Result newResult = execute(url, this.username, this.password);
         LOG.info("Ran with additional option to be compared with.." + url);
 
-        statsSample.add(newResult.sample);
+        sampleResult.addRawSubResult(newResult.sample);
 
         verify(r.data, newResult.data); //compare old data with new data
         Preconditions.checkState(r.rows == newResult.rows, "Rows are not matching r=" + r.rows +
             ", newResult=" + newResult.rows);
       }
+      sampleResult.setSuccessful(true);
+      //Set the response msg
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < sampleResult.getSubResults().length; i++) {
+        sb.append("\n\t");
+        sb.append(i + " th sample time : " + sampleResult.getSubResults()[i].getTime());
+      }
+      sampleResult.setResponseMessage(sb.toString());
     } catch (Exception e) {
       LOG.error("Exception when running the sampler", e);
-      statsSample.setSuccessful(false);
-      statsSample.setResponseMessage("Error: " + e);
+      sampleResult.setSuccessful(false);
+      sampleResult.setResponseMessage("Error: " + e);
 
       StringWriter stringWriter = new StringWriter();
       e.printStackTrace(new PrintWriter(stringWriter));
-      statsSample.setResponseData(stringWriter.toString().getBytes());
-      statsSample.setDataType(org.apache.jmeter.samplers.SampleResult.TEXT);
+      sampleResult.setResponseData(stringWriter.toString().getBytes());
+      sampleResult.setDataType(org.apache.jmeter.samplers.SampleResult.TEXT);
+    } finally {
+      sampleResult.sampleEnd();
     }
-    return statsSample;
+    return sampleResult;
   }
 
   /**
