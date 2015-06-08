@@ -128,7 +128,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     if (!driverLoaded) {
       try {
         Class.forName(DEFAULT_DRIVER);
-        System.out.println("Loaded driver : " + context.getParameter("driver"));
+        System.out.println("Loaded driver : " + DEFAULT_DRIVER);
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
         LOG.error("ClassNotFound ", e);
