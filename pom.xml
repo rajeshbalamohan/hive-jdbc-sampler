@@ -12,7 +12,7 @@
         <hadoop.version>2.7.0</hadoop.version>
         <hive.version>1.2.0</hive.version>
         <jmeter.version>2.11</jmeter.version>
-        <httpcore.version>4.3.5</httpcore.version>
+        <httpcore.version>4.3.3</httpcore.version>
     </properties>
     <dependencies>
         <dependency>
@@ -36,6 +36,16 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.version}</version>
         </dependency>
 
     </dependencies>
