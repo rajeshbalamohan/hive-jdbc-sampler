@@ -55,7 +55,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   private static final Logger LOG = LoggingManager.getLoggerForClass();
 
   private static final String URL = "url";
-  private static final String DRIVER = "driver";
+  private static final String DEFAULT_DRIVER = "org.apache.hive.jdbc.HiveDriver";
   private static final String USERNAME = "username";
   private static final String PASSWORD = "password";
   private static final String ADDITIONAL_CONN_PARAMS = "additionalParams";
@@ -81,7 +81,6 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     Arguments defaultParameters = new Arguments();
     //Populate from system.properties instead
     defaultParameters.addArgument(URL, "${__property(url)}");
-    defaultParameters.addArgument(DRIVER, "org.apache.hive.jdbc.HiveDriver");
     defaultParameters.addArgument(USERNAME, "${__property(user,,root)}");
     defaultParameters.addArgument(PASSWORD, "${__property(password,,)}");
     defaultParameters.addArgument(ADDITIONAL_CONN_PARAMS,
@@ -128,7 +127,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
       throws Exception {
     if (!driverLoaded) {
       try {
-        Class.forName(context.getParameter(DRIVER));
+        Class.forName(DEFAULT_DRIVER);
         System.out.println("Loaded driver : " + context.getParameter("driver"));
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
