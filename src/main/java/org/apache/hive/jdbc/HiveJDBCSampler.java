@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Ordering;
+import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -12,6 +13,11 @@ import org.apache.jorphan.collections.Data;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -29,17 +35,17 @@ import java.util.List;
  * Simple hive JDBC sampler which can be used for
  * 1. Running basic benchmark
  * 2. For validation, wherein you would like to compare the test results of 2 runs for the same
- * query with different parameters.
+ * queryFile with different parameters.
  *
  * e.g Test whether results are same for pipelinedsorter vs defaultsorter.
  *
  * In such cases, "compareWith_ConnectionParams" can be populated with necessary parameters so
- * that for every query, it would run the normal job & also with the
+ * that for every queryFile, it would run the normal job & also with the
  * "compareWith_ConnectionParams". It also checks if the results are exactly the same. One caveat
  * is that, if the sample set is too big, one might want to tweak the memory settings of jmeter.
  *
  * Alternatively, large datasets can be populated into another table, which can then be compared
- * by running another query via jmeter.
+ * by running another queryFile via jmeter.
  *
  * Parameters of interest to be set in system.properties
  * url - JDBC url
@@ -47,7 +53,7 @@ import java.util.List;
  * password - for JDBC
  * additionalParams - additional configs/parameters to be sent to HiveServer2
  * queryType - select/insert
- * compareWithParams - additional configs/parameters to be tried out for second run of the query.
+ * compareWithParams - additional configs/parameters to be tried out for second run of the queryFile.
  * </pre>
  */
 public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -60,8 +66,9 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   private static final String PASSWORD = "password";
   private static final String ADDITIONAL_CONN_PARAMS = "additionalParams";
   private static final String SELECT_OR_UPDATE = "queryType";
-  private static final String QUERY = "query";
+  private static final String QUERY_FILE = "queryFile";
   private static final String COMPARE_WITH_CONN_PARAMS = "compareWithParams";
+  private static final String SQL_FILES_BASE_FOLDER = "sqlFilesBaseFolder";
 
   private static boolean driverLoaded = false;
   private Connection conn = null;
@@ -69,10 +76,12 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
   private String username;
   private String password;
   private boolean select; //select statement or update statement
+  private String queryFile;
   private String query;
   private boolean sessionMode = true; //make 1 connection.
   private JavaSamplerContext context;
   private String compareWithOptions;
+  private String sqlFilesBaseFolder;
 
   private ResultSetMetaData rsmd;
 
@@ -86,10 +95,35 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
     defaultParameters.addArgument(ADDITIONAL_CONN_PARAMS,
         "${__property(additionalParams,,?hive.execution.engine=tez)}");
     defaultParameters.addArgument(SELECT_OR_UPDATE, "${__property(queryType,,select)}");
-    defaultParameters.addArgument(QUERY,
-        "select count(*) from store_sales where ss_sold_date is null");
+    defaultParameters.addArgument(QUERY_FILE,
+        "queryFile");
     defaultParameters.addArgument(COMPARE_WITH_CONN_PARAMS, "${__property(compareWithParams,,)}");
+    defaultParameters.addArgument(SQL_FILES_BASE_FOLDER, "${__property(sqlFilesBaseFolder,,)}");
     return defaultParameters;
+  }
+
+  private String readQuery(String queryFile) {
+    StringBuilder query = new StringBuilder();
+    FileReader reader = null;
+    try {
+      reader = new FileReader(new File(sqlFilesBaseFolder, queryFile));
+      BufferedReader br = new BufferedReader(reader);
+      while(br.ready()) {
+        query.append(br.readLine()).append(" ");
+      }
+    } catch(FileNotFoundException fnf) {
+      throw new RuntimeException(fnf);
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    } finally {
+      IOUtils.closeQuietly(reader);
+    }
+    String q = query.toString().trim();
+    if (q.endsWith(";")) {
+      return q.substring(0, q.length()-1);
+    } else {
+      return q;
+    }
   }
 
   @Override
@@ -101,21 +135,27 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
       this.username = context.getParameter(PASSWORD);
       this.select =
           context.getParameter(SELECT_OR_UPDATE, "select").trim().equalsIgnoreCase("select");
-      this.query = context.getParameter(QUERY);
-      if (this.query == null || this.query.trim().length() == 0) {
-        throw new IllegalArgumentException("Please pass a valid query");
+      this.queryFile = context.getParameter(QUERY_FILE);
+      if (this.queryFile == null || this.queryFile.trim().length() == 0) {
+        throw new IllegalArgumentException("Please pass a valid queryFile");
       }
       this.compareWithOptions = context.getParameter(COMPARE_WITH_CONN_PARAMS);
       if (!Strings.isNullOrEmpty(compareWithOptions)) {
         sessionMode = false;
       }
+      this.sqlFilesBaseFolder = context.getParameter(SQL_FILES_BASE_FOLDER);
+      this.query = readQuery(this.queryFile);
+      Preconditions.checkArgument(!Strings.isNullOrEmpty(query), "Please provide valid query for "
+          + "testing");
 
       LOG.info("url:" + url);
       LOG.info("username:" + username);
       LOG.info("password:" + password);
       LOG.info("selectType:" + select);
-      LOG.info("query:" + query);
+      LOG.info("queryFile:" + queryFile);
       LOG.info("compareWithOptions:" + compareWithOptions);
+      LOG.info("sqlFilesBaseFolder:" + sqlFilesBaseFolder);
+      LOG.info("query:" + query);
 
       initConnection(this.url, this.username, this.password);
     } catch (Exception e) {
@@ -171,7 +211,7 @@ public class HiveJDBCSampler extends AbstractJavaSamplerClient implements Serial
         result.data = Data.getDataFromResultSet(rs);
         rs.close();
       } else {
-        result.rows = stmt.executeUpdate(context.getParameter("query"));
+        result.rows = stmt.executeUpdate(context.getParameter("queryFile"));
       }
 
       result.sample.setResponseMessage("\nSuccess");
