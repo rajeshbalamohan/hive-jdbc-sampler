@@ -55,10 +55,6 @@ Running jmeter in non-gui mode:
 
 5. In case you don't want any comparison, just remove "-DcompareWithParams" from previous example.
 
-Important Note:
-==============
-1. "query" argument in jmeter points to a single query file. Do not try to add multiple queries in the same file. Create individual query files for different queries. 
-
 Debugging:
 =========
 1. In case hive job is not starting, check the console logs of hiveserver2 (to verify if the query is getting submitted by jmeter).  Check jmeter.log as well for any exceptions.
