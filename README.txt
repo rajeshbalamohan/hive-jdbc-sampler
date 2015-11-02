@@ -24,8 +24,8 @@ TPC-DS JMeter script:
 ====================
 1. tpcds-hive.jmx is attached here, which has the details on tpcds queries.
 2. Checkout hive-testbench which has TPC-DS and TPC-H queries. Note down the location of TPC-DS query folder.
-3. Configure "jmeter-run.sh" to point to the tpcds query folder (hive-bench). For more
-details, refer to the example given in next section.
+3. Configure your jmeter command line arguement to point to the tpcds query folder (hive-bench). For more
+details on command-line option, refer to the example given in next section.
 
 Running jmeter in non-gui mode:
 ==============================
