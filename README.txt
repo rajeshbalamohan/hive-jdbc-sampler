@@ -49,7 +49,7 @@ Running jmeter in non-gui mode:
  queries. Now, you can refer to different queries with their names specified
  in "queryFile".
 
-3. To run in non-GUI mode, ./jmeter -n -t tpcds-hive.jmx
+3. To run in non-GUI mode, ./jmeter -n -t tpcds-hive.jmx (with all the rest of the arguments mentioned above)
 
 4. Pass any hiveconf related items in "additionalConnectionParams" parameter of hive.jmx (e.g ?hive.execution.engine=tez;hive.auto.convert.join.noconditionaltask=false)
 
